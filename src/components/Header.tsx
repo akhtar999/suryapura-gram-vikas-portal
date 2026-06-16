@@ -50,13 +50,13 @@ const Header = () => {
             className="flex min-w-0 items-center gap-2.5 rounded-xl py-1 pr-2"
             aria-label="Suryapura Gram Vikas Portal — home"
           >
-            <SunMark className="h-9 w-9 shrink-0" />
+            <SunMark className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" />
             <span className="min-w-0 leading-tight">
-              <span className="block whitespace-nowrap font-display text-[0.95rem] font-semibold tracking-tight text-ink-strong sm:text-base">
+              <span className="block whitespace-nowrap font-display text-[0.85rem] font-semibold tracking-tight text-ink-strong sm:text-base">
                 Suryapura
                 <span className="text-ink-soft"> Gram Vikas Portal</span>
               </span>
-              <span className="block truncate text-[0.7rem] font-medium text-primary">
+              <span className="block truncate text-[0.62rem] sm:text-[0.7rem] font-medium text-primary">
                 सूर्यपुरा ग्राम विकास पोर्टल
               </span>
             </span>
