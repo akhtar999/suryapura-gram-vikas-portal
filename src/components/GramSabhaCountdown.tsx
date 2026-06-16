@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ChevronUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronUp, Clock, MapPin, FileText } from "lucide-react";
 import { LandmarkIcon } from "./icons";
 import {
   Drawer,
@@ -42,8 +42,6 @@ const GramSabhaCountdown = () => {
   const [time, setTime] = useState<TimeLeft | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Set time asynchronously after mount to avoid server/client mismatch
@@ -58,61 +56,25 @@ const GramSabhaCountdown = () => {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 12);
-      // Collapse while actively scrolling; reveal again shortly after it
-      // stops. Always stay visible at the very top.
-      if (y <= 12) {
-        setCollapsed(false);
-        return;
-      }
-      setCollapsed(true);
-      if (idleTimer.current) clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(() => setCollapsed(false), 200);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (idleTimer.current) clearTimeout(idleTimer.current);
-    };
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <>
       <div
-        className={`absolute top-[calc(100%-1px)] left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] cursor-pointer transition-all duration-300 ease-out ${
-          collapsed ? "-translate-y-[130%] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
-        }`}
+        className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] cursor-pointer"
         onClick={() => setShowDrawer(true)}
       >
-        {/* Left Fillet (curves meeting bar to navbar) */}
         <div
-          className="absolute top-0 right-full w-5 h-5 transition-all duration-300 pointer-events-none backdrop-blur-md"
-          style={{
-            background: scrolled
-              ? `radial-gradient(circle at 0% 100%, transparent 18.5px, color-mix(in oklab, var(--border) 80%, transparent) 19px, color-mix(in oklab, var(--border) 80%, transparent) 20px, color-mix(in oklab, var(--card) 80%, transparent) 20.5px)`
-              : `radial-gradient(circle at 0% 100%, transparent 20px, color-mix(in oklab, var(--card) 55%, transparent) 20.5px)`
-          }}
-        >
-          {scrolled && (
-            <div className="absolute top-0 inset-x-0 h-[2px] bg-surface z-20 pointer-events-none" />
-          )}
-        </div>
-
-        <div
-          className={`relative overflow-hidden rounded-b-2xl border-x border-b transition-all duration-300 ${
+          className={`relative overflow-hidden transition-all duration-300 ${
             scrolled
-              ? "border-line/80 bg-surface/80 shadow-[0_8px_30px_-18px_oklch(0.31_0.072_152/0.5)]"
-              : "border-transparent bg-surface/55"
-          } px-2.5 py-1 sm:px-4 sm:py-1.5 backdrop-blur-md flex items-center gap-2 sm:gap-4 select-none`}
+              ? "border-line bg-surface/90 shadow-[0_12px_40px_-12px_oklch(0.31_0.072_152/0.4)] hover:shadow-[0_16px_40px_-10px_oklch(0.31_0.072_152/0.5)]"
+              : "border-line/60 bg-surface/80 shadow-[0_8px_30px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.15)]"
+          } rounded-full border px-3 py-1.5 sm:px-5 sm:py-2 backdrop-blur-lg flex items-center gap-2.5 sm:gap-4 select-none`}
         >
-          {/* Border mask to remove dividing line between navbar and tab */}
-          {scrolled && (
-            <div className="absolute top-0 inset-x-[1px] h-[2px] bg-surface z-20 pointer-events-none" />
-          )}
-
           {/* Ambient gold glow */}
           <div
             aria-hidden
@@ -123,7 +85,7 @@ const GramSabhaCountdown = () => {
           />
 
           {/* Identity */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <span
               className="flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center rounded-full text-on-gold"
               style={{
@@ -180,76 +142,73 @@ const GramSabhaCountdown = () => {
             <ChevronUp className="h-3.5 w-3.5 shrink-0 text-primary" />
           </div>
         </div>
-
-        {/* Right Fillet (curves meeting bar to navbar) */}
-        <div
-          className="absolute top-0 left-full w-5 h-5 transition-all duration-300 pointer-events-none backdrop-blur-md"
-          style={{
-            background: scrolled
-              ? `radial-gradient(circle at 100% 100%, transparent 18.5px, color-mix(in oklab, var(--border) 80%, transparent) 19px, color-mix(in oklab, var(--border) 80%, transparent) 20px, color-mix(in oklab, var(--card) 80%, transparent) 20.5px)`
-              : `radial-gradient(circle at 100% 100%, transparent 20px, color-mix(in oklab, var(--card) 55%, transparent) 20.5px)`
-          }}
-        >
-          {scrolled && (
-            <div className="absolute top-0 inset-x-0 h-[2px] bg-surface z-20 pointer-events-none" />
-          )}
-        </div>
       </div>
 
       {/* Meeting details — shadcn Drawer (Vaul) bottom sheet */}
       <Drawer open={showDrawer} onOpenChange={setShowDrawer}>
-        <DrawerContent className="mx-auto max-w-lg select-none rounded-t-3xl border-line/60 bg-surface/95 pb-8">
-          <DrawerHeader className="text-left">
-            <div className="flex items-center gap-3">
+        <DrawerContent className="mx-auto max-w-lg select-none rounded-t-[2.5rem] border-line/60 bg-gradient-to-b from-surface via-surface/95 to-surface-sunk/90 pb-8 backdrop-blur-xl shadow-2xl">
+          <DrawerHeader className="text-left pt-6 pb-2">
+            <div className="flex items-center gap-3.5">
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-on-gold"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-on-gold shadow-md"
                 style={{
                   background: "linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-strong) 100%)",
                 }}
               >
-                <LandmarkIcon className="h-4.5 w-4.5" />
+                <LandmarkIcon className="h-5 w-5" />
               </span>
               <div>
-                <DrawerTitle className="font-display text-base font-extrabold text-ink-strong">
+                <DrawerTitle className="font-display text-lg font-extrabold text-ink-strong">
                   ग्राम सभा बैठक
                 </DrawerTitle>
-                <DrawerDescription className="text-[0.7rem] font-bold uppercase tracking-wider text-primary">
+                <DrawerDescription className="text-[0.7rem] font-bold uppercase tracking-wider text-primary mt-0.5">
                   Gram Sabha Assembly Details
                 </DrawerDescription>
               </div>
             </div>
           </DrawerHeader>
 
-          <hr className="mx-4 border-line" />
+          <div className="mx-4 my-2 border-t border-line/40" />
 
-          {/* Info Details */}
-          <div className="flex flex-col gap-4 px-4 pt-4 text-xs font-semibold leading-relaxed text-ink-strong">
-            <div className="flex gap-3">
-              <span className="text-xl shrink-0" role="img" aria-label="time">⏰</span>
+          {/* Info Details as premium card items */}
+          <div className="flex flex-col gap-3.5 px-4 pt-2">
+            {/* Time Card */}
+            <div className="flex items-center gap-4 p-4 rounded-[1.5rem] border border-line/35 bg-surface-sunk/30 hover:bg-surface-sunk/55 hover:border-line/60 transition-all duration-300">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gold/20 to-gold-strong/15 text-ochre border border-gold-strong/10">
+                <Clock className="h-5 w-5" />
+              </span>
               <div>
-                <p className="text-ink-strong font-bold">22 जून 2026, सुबह 11:00 बजे</p>
-                <p className="text-[0.65rem] text-ink-soft">Monday, 22 June 2026 · 11:00 AM</p>
+                <p className="text-sm font-extrabold text-ink-strong">22 जून 2026, सुबह 11:00 बजे</p>
+                <p className="text-[0.7rem] text-ink-soft mt-0.5">Monday, 22 June 2026 · 11:00 AM</p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <span className="text-xl shrink-0" role="img" aria-label="venue">📍</span>
+
+            {/* Venue Card */}
+            <div className="flex items-center gap-4 p-4 rounded-[1.5rem] border border-line/35 bg-surface-sunk/30 hover:bg-surface-sunk/55 hover:border-line/60 transition-all duration-300">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary-deep/15 text-primary border border-primary/10">
+                <MapPin className="h-5 w-5" />
+              </span>
               <div>
-                <p className="text-ink-strong font-bold">पंचायत भवन सभाकक्ष</p>
-                <p className="text-[0.65rem] text-ink-soft">Panchayat Bhavan Assembly Hall</p>
+                <p className="text-sm font-extrabold text-ink-strong">पंचायत भवन सभाकक्ष</p>
+                <p className="text-[0.7rem] text-ink-soft mt-0.5">Panchayat Bhavan Assembly Hall</p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <span className="text-xl shrink-0" role="img" aria-label="agenda">📋</span>
+
+            {/* Agenda Card */}
+            <div className="flex items-center gap-4 p-4 rounded-[1.5rem] border border-line/35 bg-surface-sunk/30 hover:bg-surface-sunk/55 hover:border-line/60 transition-all duration-300">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-ochre/20 to-gold-strong/15 text-ochre border border-gold-strong/10">
+                <FileText className="h-5 w-5" />
+              </span>
               <div>
-                <p className="text-ink-strong font-bold">एजेंडा: नया जल बजट और सड़क विकास प्रस्ताव</p>
-                <p className="text-[0.65rem] text-ink-soft">Agenda: Water Budget & Rural Road Maintenance</p>
+                <p className="text-sm font-extrabold text-ink-strong">नया जल बजट और सड़क विकास प्रस्ताव</p>
+                <p className="text-[0.7rem] text-ink-soft mt-0.5">Agenda: Water Budget & Rural Road Maintenance</p>
               </div>
             </div>
           </div>
 
-          <DrawerFooter>
+          <DrawerFooter className="pt-6">
             <DrawerClose asChild>
-              <button className="w-full cursor-pointer rounded-xl bg-primary py-2.5 text-center text-xs font-bold text-on-primary transition-transform hover:bg-primary-deep active:scale-[0.98]">
+              <button className="w-full cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-primary-deep py-3.5 text-center text-sm font-bold text-on-primary transition-all duration-300 hover:brightness-105 active:scale-[0.98] shadow-md shadow-primary/20">
                 बंद करें · Close
               </button>
             </DrawerClose>

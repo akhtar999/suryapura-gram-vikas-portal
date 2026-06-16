@@ -7,12 +7,12 @@ import { ArrowLeftRight } from "lucide-react";
 
 const beforeAfterData = {
   before: {
-    src: "https://images.unsplash.com/photo-1515165616741-92e26e3a8b26?auto=format&fit=crop&w=900&q=75",
+    src: "/road_before.png",
     alt: "An unpaved dirt village road before construction",
     label: "पहले · Before",
   },
   after: {
-    src: "https://images.unsplash.com/photo-1515165616741-92e26e3a8b26?auto=format&fit=crop&w=900&q=75",
+    src: "/road_after.png",
     alt: "A newly paved village road after construction",
     label: "अब · After",
   },

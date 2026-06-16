@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Home, Sprout, Route, Landmark, Phone, Sun, Moon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Home, Sprout, Sparkles, Landmark, Phone, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { LimelightNav, type NavItem } from "@/components/ui/limelight-nav";
 
@@ -17,12 +17,14 @@ const selectPillar = (index: number) => () => {
   scrollToSection("pillars")();
 };
 
-const navItems: NavItem[] = [
-  { id: "top",            icon: <Home />,     label: "Home",      onClick: scrollToSection("top") },
-  { id: "pillars",        icon: <Sprout />,   label: "Pillars",   onClick: selectPillar(0) },
-  { id: "infrastructure", icon: <Route />,    label: "Progress",  onClick: selectPillar(2) },
-  { id: "panchayat",      icon: <Landmark />, label: "Panchayat", onClick: selectPillar(3) },
-  { id: "support",        icon: <Phone />,    label: "Support",   onClick: scrollToSection("support") },
+// Full set of destinations (id === the section's DOM id). The bar renders only
+// those whose section is actually present on the page — see MobileBottomNav.
+const ALL_NAV: NavItem[] = [
+  { id: "top",       icon: <Home />,     label: "Home",      onClick: scrollToSection("top") },
+  { id: "pillars",   icon: <Sprout />,   label: "Pillars",   onClick: selectPillar(0) },
+  { id: "services",  icon: <Sparkles />, label: "Services",  onClick: scrollToSection("services") },
+  { id: "panchayat", icon: <Landmark />, label: "Panchayat", onClick: selectPillar(3) },
+  { id: "support",   icon: <Phone />,    label: "Support",   onClick: scrollToSection("support") },
 ];
 
 const MobileBottomNav = () => {
@@ -30,6 +32,16 @@ const MobileBottomNav = () => {
   const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
+
+  // Render only nav items whose target section exists, so the bar adapts as
+  // sections are added or removed from the page.
+  const navItems = useMemo(
+    () =>
+      mounted
+        ? ALL_NAV.filter((item) => document.getElementById(String(item.id)))
+        : ALL_NAV,
+    [mounted]
+  );
 
   // Scroll-spy: highlight the nav item whose section is currently in view.
   const [activeIndex, setActiveIndex] = useState(0);
@@ -67,7 +79,7 @@ const MobileBottomNav = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [navItems]);
 
   const isDark = mounted && resolvedTheme === "dark";
 

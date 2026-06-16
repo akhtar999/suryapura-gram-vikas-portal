@@ -4,7 +4,7 @@ import TickerBar from "@/components/TickerBar";
 import Pillars from "@/components/Pillars";
 import Chaupal from "@/components/Chaupal";
 import Testimonials from "@/components/Testimonials";
-import VillageGallery from "@/components/VillageGallery";
+import VillageServices from "@/components/VillageServices";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import ActionBand from "@/components/ActionBand";
 import Footer from "@/components/Footer";
@@ -19,10 +19,12 @@ const Home = () => (
       <TickerBar />
       <Pillars />
       <Chaupal />
-      <Testimonials />
-      <VillageGallery />
+      {/* <Testimonials /> */}
+      <VillageServices />
       <BeforeAfterSlider />
+      <Testimonials />
       <ActionBand />
+      {/* <Testimonials /> */}
     </main>
     <Footer />
     <QuickContact />

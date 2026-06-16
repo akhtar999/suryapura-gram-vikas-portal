@@ -668,9 +668,7 @@ const Pillars = () => {
 
         {/* ── Festival Countdown · आगामी कार्यक्रम ────────────────── */}
         <div className="lg:col-span-12">
-          <div className="max-w-md">
-            <FestivalCountdown />
-          </div>
+          <FestivalCountdown />
         </div>
       </div>
     </section>

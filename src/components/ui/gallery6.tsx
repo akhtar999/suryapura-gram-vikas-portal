@@ -141,9 +141,50 @@ const Gallery6 = ({
         </CarouselContent>
       </Carousel>
 
-      {/* Dots */}
+      {/* Mobile Controls & Dots */}
+      <div className="mt-7 flex items-center justify-between sm:hidden">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => api?.scrollPrev()}
+          disabled={!canScrollPrev}
+          aria-label="Previous"
+          className="h-10 w-10 rounded-full border-line bg-surface text-ink-strong disabled:opacity-40"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        {/* Dots */}
+        {snapCount > 1 && (
+          <div className="flex gap-2">
+            {Array.from({ length: snapCount }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => api?.scrollTo(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === selected ? "w-6 bg-primary" : "w-2 bg-line-strong"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => api?.scrollNext()}
+          disabled={!canScrollNext}
+          aria-label="Next"
+          className="h-10 w-10 rounded-full border-line bg-surface text-ink-strong disabled:opacity-40"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Desktop Dots */}
       {snapCount > 1 && (
-        <div className="mt-7 flex justify-center gap-2">
+        <div className="hidden sm:flex mt-7 justify-center gap-2">
           {Array.from({ length: snapCount }).map((_, i) => (
             <button
               key={i}

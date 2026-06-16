@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import VoiceSearch from "./VoiceSearch";
-import { ArrowRightIcon, PhoneIcon, SunIcon } from "./icons";
+import { ArrowRightIcon, PhoneIcon } from "./icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { heroImage, leader, trustStats } from "@/lib/content";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -151,7 +151,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="top" className="relative overflow-hidden pt-32 lg:pt-28 timeline-hero">
+    <section id="top" className="relative overflow-hidden pt-32 lg:pt-36 timeline-hero">
       {/* Paddy field backdrop — the whole hero sits over a rice-field photo. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <Image
@@ -206,8 +206,7 @@ const Hero = () => {
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 pb-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:pb-24">
         {/* ---- Copy ---- */}
         <div className="max-w-xl parallax-text">
-          <p className="rise reveal-delay-1 flex items-center gap-2 text-base font-semibold text-primary">
-            <SunIcon className="h-5 w-5 text-gold-strong" />
+          <p className="rise reveal-delay-1 flex items-center justify-center lg:justify-start gap-2 text-base font-semibold text-primary">
             <TimeGreeting />
           </p>
 
@@ -216,9 +215,8 @@ const Hero = () => {
           </h1>
 
           <p className="rise reveal-delay-3 mt-5 max-w-prose text-lg leading-relaxed text-ink-soft">
-            Mandi prices before you reach the field. School progress you can see.
-            Roads you can track. The whole Panchayat in your pocket. In your
-            language, on any phone, even on a slow morning signal.
+            Live mandi prices, school updates, and project tracking. The entire
+            Panchayat in your pocket — in your language, even on low signal.
           </p>
 
           <div className="rise reveal-delay-4 mt-7">
