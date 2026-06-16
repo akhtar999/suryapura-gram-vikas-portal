@@ -50,16 +50,18 @@ const SlidingTranslation = ({
 const CountUpStat = ({ value, label, hi }: { value: string; label: string; hi: string }) => {
   const { ref, display } = useCountUp(value, 2000);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center justify-center px-1 text-center sm:px-3">
       <dd
         ref={ref as React.Ref<HTMLElement>}
-        className="order-1 font-display text-2xl font-bold text-ink-strong sm:text-[1.7rem]"
+        className="order-1 font-display text-[clamp(1.5rem,5vw,2.25rem)] font-bold leading-none tracking-tight text-ink-strong whitespace-nowrap"
       >
         {display}
       </dd>
-      <dt className="order-2 mt-0.5 text-[0.8rem] leading-snug text-ink-soft">
+      <dt className="order-2 mt-2 text-xs leading-snug text-ink-soft sm:text-sm">
         {label}
-        <span className="block text-primary/80">{hi}</span>
+        <span className="mt-0.5 block text-[0.7rem] font-semibold text-primary/80 sm:text-xs">
+          {hi}
+        </span>
       </dt>
     </div>
   );
@@ -260,7 +262,9 @@ const Hero = () => {
             </ShinyButton>
           </div>
 
-          <dl className="rise reveal-delay-5 mt-9 grid grid-cols-3 gap-4 border-t border-line pt-6">
+          {/* Headline stats as a single bordered card with vertical dividers —
+              same treatment as the standalone StatsSection, kept animated here. */}
+          <dl className="rise reveal-delay-5 mt-9 grid grid-cols-3 gap-2 divide-x divide-line/70 rounded-xl bg-surface p-4 ring-1 ring-foreground/10 sm:gap-4 sm:p-5">
             {trustStats.map((stat) => (
               <CountUpStat key={stat.label} value={stat.value} label={stat.label} hi={stat.hi} />
             ))}
