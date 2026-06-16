@@ -240,6 +240,11 @@
   .marquee-track-reverse {
     animation: marquee-reverse var(--marquee-duration, 60s) linear infinite;
   }
+  /* Vertical variant for the testimonial columns — content is duplicated x2,
+     so -50% loops seamlessly. Runs on the compositor instead of the JS thread. */
+  .marquee-vertical {
+    animation: marquee-vertical var(--marquee-duration, 15s) linear infinite;
+  }
   .marquee-mask:hover .marquee-track,
   .marquee-mask:hover .marquee-track-reverse {
     animation-play-state: paused;
@@ -265,6 +270,28 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Low-end GPU guardrails for glassmorphism.
+   backdrop-filter is cheap on flagships but re-samples everything behind it
+   each scroll frame on budget Android. These rules are unlayered so they win
+   over Tailwind's `backdrop-blur-*` utilities.
+   1) No backdrop-filter support  → solid-ish surface, no blur at all.
+   2) On phones (the low-end tier) → cap blur instead of stacking md/lg/xl.
+---------------------------------------------------------------------------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: color-mix(in oklab, var(--card) 96%, transparent) !important;
+  }
+}
+@media (max-width: 768px) {
+  [class*="backdrop-blur"] {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 }
 
@@ -313,6 +340,10 @@
   from { transform: translateX(-50%); }
   to { transform: translateX(0); }
 }
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
 
 /* ── Scroll-Driven 3D/Depth Parallax ────────────────── */
 @keyframes parallax-glow {
@@ -356,7 +387,7 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rise, .grow-bar, .sun-drift, .pulse-mic,
-  .marquee-track, .marquee-track-reverse,
+  .marquee-track, .marquee-track-reverse, .marquee-vertical,
   .parallax-glow, .parallax-photo, .parallax-text,
   .animate-rise, .animate-soundwave, .pillar-in {
     animation: none !important;

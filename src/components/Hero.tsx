@@ -120,33 +120,45 @@ const Hero = () => {
 
     if (!hero) return;
 
-    const onScroll = () => {
+    // Cache the hero height instead of calling getBoundingClientRect() on every
+    // scroll event — reading layout per-scroll forces a synchronous reflow, the
+    // single worst jank source on the low-end browsers that hit this fallback.
+    let heroHeight = hero.offsetHeight;
+    let frame = 0;
+
+    const apply = () => {
+      frame = 0;
       const scrollY = window.scrollY;
-      const heroRect = hero.getBoundingClientRect();
-      const heroHeight = heroRect.height;
+      if (scrollY > heroHeight) return; // Hero scrolled out of view
+      const progress = Math.max(0, Math.min(1, scrollY / heroHeight));
 
-      // Only perform parallax adjustments if Hero is in view
-      if (scrollY <= heroHeight) {
-        const progress = Math.max(0, Math.min(1, scrollY / heroHeight));
-
-        if (glow) {
-          glow.style.transform = `translate3d(${progress * 15}px, ${-progress * 15}px, 0) scale(${1 + progress * 0.05}) translateY(${progress * 100}px)`;
-        }
-        if (photo) {
-          photo.style.transform = `translateY(${-progress * 70}px)`;
-        }
-        if (text) {
-          text.style.transform = `translateY(${-progress * 30}px)`;
-        }
+      if (glow) {
+        glow.style.transform = `translate3d(${progress * 15}px, ${-progress * 15}px, 0) scale(${1 + progress * 0.05}) translateY(${progress * 100}px)`;
+      }
+      if (photo) {
+        photo.style.transform = `translateY(${-progress * 70}px)`;
+      }
+      if (text) {
+        text.style.transform = `translateY(${-progress * 30}px)`;
       }
     };
 
+    // Coalesce scroll bursts into one transform write per animation frame.
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+    const onResize = () => {
+      heroHeight = hero.offsetHeight;
+    };
+
+    apply(); // set initial positions
     window.addEventListener("scroll", onScroll, { passive: true });
-    // Run once to set initial positions
-    onScroll();
+    window.addEventListener("resize", onResize);
 
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 

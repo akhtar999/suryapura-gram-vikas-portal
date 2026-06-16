@@ -2,7 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { motion, type MotionProps } from "framer-motion";
+import { motion, type MotionProps } from "motion/react";
 
 import { cn } from "@/lib/utils";
 

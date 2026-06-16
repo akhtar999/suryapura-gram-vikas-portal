@@ -13,8 +13,11 @@ const bricolage = Bricolage_Grotesque({
 const mukta = Mukta({
   variable: "--font-mukta",
   subsets: ["latin", "devanagari"],
-  weight: ["300", "400", "500", "600", "700"],
+  // Devanagari subsets are heavy on 3G — drop the unused 300 weight (font-light
+  // appears nowhere); 400/500/600/700 are all referenced.
+  weight: ["400", "500", "600", "700"],
   display: "swap",
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {

@@ -49,16 +49,27 @@ const FestivalCountdown = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Ticks only while the tab is visible to avoid a backgrounded re-render loop.
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const tick = () => {
       setTimeLeft(getTimeLeft(event.date));
       setMounted(true);
-    }, 0);
-    const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft(event.date));
-    }, 1000);
+    };
+    const start = () => {
+      tick();
+      interval = setInterval(tick, 1000);
+    };
+    const stop = () => {
+      if (interval) clearInterval(interval);
+      interval = undefined;
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [event.date]);
 
@@ -97,8 +108,9 @@ const FestivalCountdown = () => {
           </div>
         </div>
 
-        {/* Countdown Digits */}
-        <div className="shrink-0">
+        {/* Countdown Digits — fixed min-height so the placeholder→digits swap
+            reserves the same space and never shifts layout (CLS). */}
+        <div className="flex min-h-[3.25rem] shrink-0 items-center justify-center">
           {mounted && timeLeft ? (
             <div className="flex items-center gap-2.5 sm:gap-4 justify-center">
               {/* Days */}

@@ -60,8 +60,10 @@ const VillageServices = () => {
                 index={index}
                 imageUrl={slide.image}
                 alt={slide.title}
-                loading="eager"
-                decoding="async"
+                width={1024}
+                height={1024}
+                sizes="(max-width: 768px) 92vw, 460px"
+                priority={index === 0}
                 className="h-full max-h-[26rem] w-full rounded-[2rem] object-cover"
               />
             ))}

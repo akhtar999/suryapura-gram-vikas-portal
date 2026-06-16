@@ -1,8 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { HTMLMotionProps, MotionConfig, motion } from "motion/react"
+import { MotionConfig, motion } from "motion/react"
+import Image, { type ImageProps } from "next/image"
 import { cn } from "@/lib/utils"
+
+// next/image driven by motion, so the clip-path reveal still animates the image
+// element directly while we gain WebP/AVIF, responsive srcset, and lazy-loading.
+const MotionImage = motion.create(Image)
 
 interface TextStaggerHoverProps {
   text: string
@@ -142,12 +147,25 @@ HoverSliderImageWrap.displayName = "HoverSliderImageWrap"
 
 export const HoverSliderImage = React.forwardRef<
   HTMLImageElement,
-  HTMLMotionProps<"img"> & HoverSliderImageProps
->(({ index, imageUrl, className, ...props }, ref) => {
+  // Drop the DOM drag/animation handlers next/image declares — motion redefines
+  // these with its own (PanInfo) signatures, so they collide on the spread.
+  Omit<
+    ImageProps,
+    | "src"
+    | "ref"
+    | "layout"
+    | "onDrag"
+    | "onDragStart"
+    | "onDragEnd"
+    | "onAnimationStart"
+  > &
+    HoverSliderImageProps
+>(({ index, imageUrl, className, alt, ...props }, ref) => {
   const { activeSlide } = useHoverSliderContext()
   return (
-    <motion.img
+    <MotionImage
       src={imageUrl}
+      alt={alt}
       className={cn("inline-block align-middle", className)}
       transition={{ ease: [0.33, 1, 0.68, 1], duration: 0.8 }}
       variants={clipPathVariants}

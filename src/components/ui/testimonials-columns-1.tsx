@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { motion } from "motion/react";
 import Image from "next/image";
 
 export type TestimonialItem = {
@@ -18,17 +15,11 @@ export const TestimonialsColumn = (props: {
 }) => {
   return (
     <div className={props.className}>
-      <motion.div
-        animate={{
-          translateY: "-50%",
-        }}
-        transition={{
-          duration: props.duration || 10,
-          repeat: Infinity,
-          ease: "linear",
-          repeatType: "loop",
-        }}
-        className="flex flex-col gap-6 pb-6 bg-background"
+      <div
+        className="marquee-vertical flex flex-col gap-6 pb-6 bg-background"
+        style={
+          { "--marquee-duration": `${props.duration || 10}s` } as React.CSSProperties
+        }
       >
         {[
           ...new Array(2).fill(0).map((_, index) => (
@@ -54,7 +45,7 @@ export const TestimonialsColumn = (props: {
             </React.Fragment>
           )),
         ]}
-      </motion.div>
+      </div>
     </div>
   );
 };

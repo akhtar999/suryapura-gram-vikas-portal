@@ -17,47 +17,54 @@ export function use3DTilt<T extends HTMLElement>(maxTilt = 8, scale = 1.02) {
     const element = ref.current;
     if (!element) return;
 
-    // Exit early if user prefers reduced motion
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
+    // Exit early if user prefers reduced motion, or on touch devices that can't
+    // hover — there the listeners are pure overhead and never fire usefully.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
-    // Set standard transition properties
-    element.style.willChange = "transform";
+    let frame = 0;
+    let pending: { x: number; y: number } | null = null;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const render = () => {
+      frame = 0;
+      if (!pending) return;
       const rect = element.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-
-      // Mouse position relative to the element
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      // Normalize coordinates to ranges between -0.5 and 0.5
-      const normalizedX = (mouseX / width) - 0.5;
-      const normalizedY = (mouseY / height) - 0.5;
-
-      // Calculate tilt rotation:
-      // - Moving mouse up (negative Y) tilts the card forward (positive rotateX)
-      // - Moving mouse right (positive X) tilts the card right (positive rotateY)
+      const normalizedX = (pending.x - rect.left) / rect.width - 0.5;
+      const normalizedY = (pending.y - rect.top) / rect.height - 0.5;
+      // Up tilts forward (+rotateX); right tilts right (+rotateY).
       const rotateX = -normalizedY * maxTilt;
       const rotateY = normalizedX * maxTilt;
-
-      // Apply transforms
       element.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(${scale}, ${scale}, ${scale})`;
+    };
+
+    // Coalesce mousemove bursts into one layout read + transform write per frame.
+    const handleMouseMove = (e: MouseEvent) => {
+      pending = { x: e.clientX, y: e.clientY };
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    const handleMouseEnter = () => {
+      // Promote to its own layer only while interacting, then release it.
+      element.style.willChange = "transform";
       element.style.transition = "transform 100ms cubic-bezier(0.22, 1, 0.36, 1)";
     };
 
     const handleMouseLeave = () => {
-      // Reset transform smoothly
+      pending = null;
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
       element.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
       element.style.transition = "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)";
+      element.style.willChange = "auto";
     };
 
+    element.addEventListener("mouseenter", handleMouseEnter);
     element.addEventListener("mousemove", handleMouseMove);
     element.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
+      if (frame) cancelAnimationFrame(frame);
+      element.removeEventListener("mouseenter", handleMouseEnter);
       element.removeEventListener("mousemove", handleMouseMove);
       element.removeEventListener("mouseleave", handleMouseLeave);
     };

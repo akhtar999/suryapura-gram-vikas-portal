@@ -1,5 +1,3 @@
-"use client";
-
 import { Wheat, GraduationCap, Route, Sun, Radio } from "lucide-react";
 import { mandiPrices, weather, projects } from "@/lib/content";
 

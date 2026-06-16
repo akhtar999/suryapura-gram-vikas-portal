@@ -44,14 +44,25 @@ const GramSabhaCountdown = () => {
   const [showDrawer, setShowDrawer] = useState(false);
 
   useEffect(() => {
-    // Set time asynchronously after mount to avoid server/client mismatch
-    const timer = setTimeout(() => {
-      setTime(getTimeLeft(MEETING_DATE));
-    }, 0);
-    const interval = setInterval(() => setTime(getTimeLeft(MEETING_DATE)), 1000);
+    // Ticks only while the tab is visible — no point re-rendering a backgrounded
+    // page once a second. Time starts null so first paint is SSR-safe.
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const tick = () => setTime(getTimeLeft(MEETING_DATE));
+    const start = () => {
+      tick();
+      interval = setInterval(tick, 1000);
+    };
+    const stop = () => {
+      if (interval) clearInterval(interval);
+      interval = undefined;
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 
