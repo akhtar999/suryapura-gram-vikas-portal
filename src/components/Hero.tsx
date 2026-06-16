@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import VoiceSearch from "./VoiceSearch";
+import GramSabhaCountdown from "./GramSabhaCountdown";
 import { ArrowRightIcon, PhoneIcon, SunIcon } from "./icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { heroImage, leader, trustStats } from "@/lib/content";
@@ -200,6 +201,11 @@ const Hero = () => {
             "radial-gradient(closest-side, var(--glow-green), transparent 70%)",
         }}
       />
+
+      {/* ---- Gram Sabha meeting countdown — centered just below the navbar ---- */}
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <GramSabhaCountdown />
+      </div>
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 pb-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:pb-24">
         {/* ---- Copy ---- */}

@@ -89,6 +89,60 @@ const G = {
   id: "linear-gradient(135deg, var(--color-primary), var(--color-gold))",
 };
 
+/** A circular progress ring for a single infrastructure project, absolutely
+ *  positioned on one side of the card via `positionClass`. */
+const InfraRing = ({
+  pct,
+  hi,
+  name,
+  positionClass,
+}: {
+  pct: number;
+  hi: string;
+  name: string;
+  positionClass: string;
+}) => {
+  const done = pct === 100;
+  const R = 26;
+  const C = 2 * Math.PI * R;
+  const gid = `infra-grad-${name.replace(/\s+/g, "-")}`;
+  return (
+    <div className={`absolute z-10 flex w-20 flex-col items-center gap-1.5 sm:w-24 ${positionClass}`}>
+      <div className="relative h-16 w-16 sm:h-[4.75rem] sm:w-[4.75rem]">
+        <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+          <defs>
+            <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={done ? "var(--color-primary-deep)" : "var(--color-gold-strong)"} />
+              <stop offset="100%" stopColor={done ? "var(--color-primary)" : "var(--color-gold)"} />
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r={R} fill="none" strokeWidth="6" className="stroke-surface-sunk" />
+          <circle
+            cx="32"
+            cy="32"
+            r={R}
+            fill="none"
+            strokeWidth="6"
+            strokeLinecap="round"
+            stroke={`url(#${gid})`}
+            strokeDasharray={C}
+            strokeDashoffset={C - (pct / 100) * C}
+            style={{ transition: "stroke-dashoffset 1.2s var(--ease-out-quint)" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          {done ? (
+            <Check className={`h-6 w-6 stroke-[3px] text-primary`} />
+          ) : (
+            <span className="font-display text-sm font-extrabold text-gold-strong sm:text-base">{pct}%</span>
+          )}
+        </div>
+      </div>
+      <p className="text-center text-[0.62rem] font-bold leading-tight text-ink">{hi}</p>
+    </div>
+  );
+};
+
 const TiltCard = ({
   children,
   className,
@@ -409,54 +463,45 @@ const Pillars = () => {
               </Badge>
             }
           />
-          <ol className="relative mt-6 space-y-6 pl-5">
+          {/* Four circular progress meters — one on each side of the card. */}
+          <div className="relative mx-auto mt-7 h-[18rem] w-full sm:h-[22rem]">
+            {/* Connecting spokes from the centre hub out to each ring */}
             <span
               aria-hidden
-              className="absolute left-[7px] top-2 bottom-2 w-px bg-line"
+              className="absolute left-1/2 top-12 bottom-12 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-line to-transparent"
             />
-            {projects.map((p) => {
-              const done = p.pct === 100;
-              return (
-                <li key={p.name} className="relative group/timeline">
-                  <span
-                    aria-hidden
-                    className={`absolute -left-[18px] top-[6px] h-2.5 w-2.5 rounded-full border-2 border-surface transition-colors duration-300 ${done ? "bg-primary" : "bg-line-strong"
-                      }`}
-                  />
-                  <div className="flex items-center justify-between gap-3 text-sm">
-                    <span className="font-bold text-ink group-hover/timeline:text-ink-strong transition-colors">
-                      {p.hi}
-                      <span className="font-normal text-ink-soft block sm:inline sm:ml-1 sm:before:content-['·_'] text-xs">
-                        {p.name}
-                      </span>
-                    </span>
-                    <span
-                      className={`flex shrink-0 items-center gap-1 font-display font-extrabold text-xs ${done ? "text-primary" : "text-gold-strong"
-                        }`}
-                    >
-                      {done && <Check className="h-3.5 w-3.5 stroke-[3.5px] animate-pulse" />}
-                      {p.pct}%
-                    </span>
-                  </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-sunk relative">
-                    <div
-                      className="grow-bar h-full rounded-full relative overflow-hidden"
-                      style={{
-                        width: `${p.pct}%`,
-                        backgroundImage: done
-                          ? "linear-gradient(90deg, var(--color-primary-deep), var(--color-primary))"
-                          : "linear-gradient(90deg, var(--color-gold-strong), var(--color-gold))",
-                      }}
-                    >
-                      {!done && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-[200%] h-full animate-shimmer" />
-                      )}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+            <span
+              aria-hidden
+              className="absolute top-1/2 left-12 right-12 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-line to-transparent"
+            />
+
+            {/* Centre hub — average progress across all projects */}
+            <div className="absolute left-1/2 top-1/2 z-20 flex h-[5.5rem] w-[5.5rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-primary/20 bg-surface/90 backdrop-blur-sm shadow-[0_10px_28px_-12px_var(--glow-green)] sm:h-24 sm:w-24">
+              <span className="font-display text-2xl font-extrabold text-primary leading-none">
+                {Math.round(projects.reduce((s, p) => s + p.pct, 0) / projects.length)}%
+              </span>
+              <span className="mt-1 text-[0.55rem] font-bold uppercase tracking-wide text-ink-soft">
+                औसत प्रगति
+              </span>
+            </div>
+
+            {projects.map((p, i) => (
+              <InfraRing
+                key={p.name}
+                pct={p.pct}
+                hi={p.hi}
+                name={p.name}
+                positionClass={
+                  [
+                    "left-1/2 top-0 -translate-x-1/2",
+                    "right-0 top-1/2 -translate-y-1/2",
+                    "left-1/2 bottom-0 -translate-x-1/2",
+                    "left-0 top-1/2 -translate-y-1/2",
+                  ][i]
+                }
+              />
+            ))}
+          </div>
         </TiltCard>
 
         {/* ── Panchayat Digital Ledger · पंचायत बही-खाता ────── */}

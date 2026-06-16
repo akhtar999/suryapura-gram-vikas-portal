@@ -61,7 +61,7 @@ const MobileBottomNav = () => {
   return (
     <div
       className="fixed inset-x-0 z-[70] flex justify-center px-3 lg:hidden"
-      style={{ bottom: "max(1.75rem, calc(env(safe-area-inset-bottom) + 1rem))" }}
+      style={{ bottom: "max(0.75rem, calc(env(safe-area-inset-bottom) + 0.5rem))" }}
     >
       {/* Unified bar — nav items on the left, theme toggle on the right */}
       <div className="flex h-16 w-full max-w-sm items-center overflow-hidden rounded-xl border border-border/40 bg-card/60 text-foreground backdrop-blur-md shadow-[0_18px_40px_-16px_var(--glow-green),inset_0_1px_0_oklch(1_0_0_/_0.18)]">
