@@ -222,18 +222,23 @@ const Hero = () => {
             <TimeGreeting />
           </p>
 
-          <h1 className="rise reveal-delay-2 mt-4 font-display text-[clamp(2rem,6vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-strong text-balance">
+          <h1 className="rise reveal-delay-2 mt-2.5 lg:mt-4 font-display text-[clamp(2rem,6vw,4.2rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-strong text-balance text-center lg:text-left">
             The Dawn of Progress, Rooted in Tradition.
           </h1>
 
-          <p className="rise reveal-delay-3 mt-5 max-w-prose text-lg leading-relaxed text-ink-soft">
-            Live mandi prices, school updates, and project tracking. The entire
-            Panchayat in your pocket — in your language, even on low signal.
+          <p className="rise reveal-delay-3 mt-2 lg:mt-5 max-w-[280px] sm:max-w-prose text-xs sm:text-base md:text-lg leading-snug sm:leading-relaxed text-ink-soft text-center lg:text-left max-lg:mx-auto">
+            <span className="sm:hidden">
+              Mandi prices, school progress & tracking. The Panchayat in your pocket — in your language.
+            </span>
+            <span className="hidden sm:inline">
+              Live mandi prices, school updates, and project tracking. The entire
+              Panchayat in your pocket — in your language, even on low signal.
+            </span>
           </p>
 
-          <div className="rise reveal-delay-4 mt-7">
+          <div className="rise reveal-delay-4 mt-4 lg:mt-7">
             <VoiceSearch />
-            <p className="mt-2.5 pl-4 text-sm text-ink-soft">
+            <p className="mt-2.5 lg:pl-4 pl-0 text-sm text-ink-soft text-center lg:text-left">
               Tap the mic to search by voice | पढ़ना न आता हो, तो बोलकर खोजें।
             </p>
           </div>
