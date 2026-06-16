@@ -23,6 +23,39 @@ const MobileBottomNav = () => {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
+  // Scroll-spy: highlight the nav item whose section is currently in view.
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    const sections = navItems.map((item) => document.getElementById(String(item.id)));
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      // Reference line in the upper third of the viewport; the active section
+      // is the last one whose top has scrolled above it.
+      const line = window.innerHeight * 0.35;
+      let next = 0;
+      sections.forEach((el, index) => {
+        if (el && el.getBoundingClientRect().top <= line) next = index;
+      });
+      setActiveIndex(next);
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
@@ -31,24 +64,25 @@ const MobileBottomNav = () => {
       style={{ bottom: "max(1.75rem, calc(env(safe-area-inset-bottom) + 1rem))" }}
     >
       {/* Unified bar — nav items on the left, theme toggle on the right */}
-      <div className="flex h-16 w-full max-w-sm items-center overflow-hidden rounded-2xl border border-line bg-card text-foreground shadow-[0_18px_40px_-16px_var(--glow-green)]">
+      <div className="flex h-16 w-full max-w-sm items-center overflow-hidden rounded-xl border border-border/40 bg-card/60 text-foreground backdrop-blur-md shadow-[0_18px_40px_-16px_var(--glow-green),inset_0_1px_0_oklch(1_0_0_/_0.18)]">
         {/* 5 nav items with limelight effect */}
         <LimelightNav
           bare
           items={navItems}
+          activeIndex={activeIndex}
           className="flex-1 px-3"
           iconContainerClassName="flex-1 px-0"
         />
 
         {/* Separator */}
-        <div className="h-8 w-px shrink-0 bg-border" />
+        <div className="h-8 w-px shrink-0 bg-border/50" />
 
         {/* Theme toggle — fills its section with gold gradient, rounded on the right to match the bar */}
         <button
           onClick={() => setTheme(isDark ? "light" : "dark")}
           aria-label={isDark ? "Switch to day mode" : "Switch to eye-care mode"}
           aria-pressed={isDark}
-          className="flex h-full items-center justify-center rounded-r-2xl px-5 text-on-gold transition-all active:brightness-95"
+          className="flex h-full items-center justify-center rounded-r-xl px-5 text-on-gold transition-all active:brightness-95"
           style={{
             background: "linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-strong) 100%)",
             boxShadow: "inset 0 1px 0 oklch(1 0 0 / 0.2)",

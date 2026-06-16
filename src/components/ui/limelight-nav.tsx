@@ -24,6 +24,8 @@ const defaultNavItems: NavItem[] = [
 type LimelightNavProps = {
   items?: NavItem[];
   defaultActiveIndex?: number;
+  /** Controlled active index. When provided, the nav reflects this value (e.g. scroll-spy) instead of tracking clicks internally. */
+  activeIndex?: number;
   onTabChange?: (index: number) => void;
   className?: string;
   limelightClassName?: string;
@@ -39,6 +41,7 @@ type LimelightNavProps = {
 export const LimelightNav = ({
   items = defaultNavItems,
   defaultActiveIndex = 0,
+  activeIndex: controlledActiveIndex,
   onTabChange,
   className,
   limelightClassName,
@@ -46,7 +49,9 @@ export const LimelightNav = ({
   iconClassName,
   bare = false,
 }: LimelightNavProps) => {
-  const [activeIndex, setActiveIndex] = useState(defaultActiveIndex);
+  const [uncontrolledActiveIndex, setUncontrolledActiveIndex] = useState(defaultActiveIndex);
+  const isControlled = controlledActiveIndex != null;
+  const activeIndex = isControlled ? controlledActiveIndex : uncontrolledActiveIndex;
   const [isReady, setIsReady] = useState(false);
   const navItemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const limelightRef = useRef<HTMLDivElement | null>(null);
@@ -72,7 +77,7 @@ export const LimelightNav = ({
   }
 
   const handleItemClick = (index: number, itemOnClick?: () => void) => {
-    setActiveIndex(index);
+    if (!isControlled) setUncontrolledActiveIndex(index);
     onTabChange?.(index);
     itemOnClick?.();
   };
