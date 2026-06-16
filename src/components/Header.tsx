@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useState } from "react";
 import SunMark from "./SunMark";
 import ThemeToggle from "./ThemeToggle";
+import GramSabhaCountdown from "./GramSabhaCountdown";
 import { navItems } from "@/lib/content";
 import { support } from "@/lib/content";
 import {
@@ -121,6 +122,7 @@ const Header = () => {
           </div>
         </div>
       </div>
+      <GramSabhaCountdown />
     </header>
   );
 };
