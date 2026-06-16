@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import {
   BookOpen,
   Calendar,
@@ -89,6 +89,16 @@ const G = {
   id: "linear-gradient(135deg, var(--color-primary), var(--color-gold))",
 };
 
+/** Tab metadata for the mobile one-pillar-at-a-time view. Order matches the
+ *  card order in the grid below. */
+const pillarTabs: { icon: IconType; hi: string; gradient: string }[] = [
+  { icon: Sprout, hi: "किसान", gradient: G.green },
+  { icon: GraduationCap, hi: "विद्या", gradient: G.gold },
+  { icon: Route, hi: "विकास", gradient: G.route },
+  { icon: ScrollText, hi: "पंचायत", gradient: G.ledger },
+  { icon: Fingerprint, hi: "पहचान", gradient: G.id },
+];
+
 /** A circular progress ring for a single infrastructure project, absolutely
  *  positioned on one side of the card via `positionClass`. */
 const InfraRing = ({
@@ -106,6 +116,13 @@ const InfraRing = ({
   const R = 26;
   const C = 2 * Math.PI * R;
   const gid = `infra-grad-${name.replace(/\s+/g, "-")}`;
+  // Start empty, then fill to the target on mount so the ring visibly grows.
+  // Remounting the card (on mobile tab switch) replays this.
+  const [offset, setOffset] = useState(C);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setOffset(C - (pct / 100) * C));
+    return () => cancelAnimationFrame(raf);
+  }, [pct, C]);
   return (
     <div className={`absolute z-10 flex w-20 flex-col items-center gap-1.5 sm:w-24 ${positionClass}`}>
       <div className="relative h-16 w-16 sm:h-[4.75rem] sm:w-[4.75rem]">
@@ -126,7 +143,7 @@ const InfraRing = ({
             strokeLinecap="round"
             stroke={`url(#${gid})`}
             strokeDasharray={C}
-            strokeDashoffset={C - (pct / 100) * C}
+            strokeDashoffset={offset}
             style={{ transition: "stroke-dashoffset 1.2s var(--ease-out-quint)" }}
           />
         </svg>
@@ -164,6 +181,26 @@ const Pillars = () => {
   const [isPlayingWeather, setIsPlayingWeather] = useState(false);
   const [calcCrop, setCalcCrop] = useState("Wheat");
   const [calcWeight, setCalcWeight] = useState("");
+  // Mobile: show one pillar at a time, driven by the tab bar. On lg+ every
+  // card is always visible in the grid, so this only hides below lg.
+  const [activeTab, setActiveTab] = useState(0);
+  const panelClass = (i: number) => (activeTab === i ? "pillar-in" : "max-lg:hidden");
+  // Remount the card whose active state flips so its entrance + bar-fill
+  // animations replay each time it's selected on mobile.
+  const panelKey = (i: number) => `${i}-${activeTab === i ? "on" : "off"}`;
+
+  // Let other components (e.g. the mobile bottom nav) deep-link into a pillar
+  // by dispatching `pillar:select` with the tab index.
+  useEffect(() => {
+    const onSelect = (e: Event) => {
+      const idx = (e as CustomEvent<number>).detail;
+      if (typeof idx === "number" && idx >= 0 && idx < pillarTabs.length) {
+        setActiveTab(idx);
+      }
+    };
+    window.addEventListener("pillar:select", onSelect);
+    return () => window.removeEventListener("pillar:select", onSelect);
+  }, []);
 
   const cropPrices: { [key: string]: number } = {
     Wheat: 2425,
@@ -264,9 +301,39 @@ const Pillars = () => {
         </p>
       </div>
 
-      <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-12 relative z-10">
+      {/* Mobile tab bar — switch between the five pillars one card at a time. */}
+      <div
+        role="tablist"
+        aria-label="Five Pillars"
+        className="lg:hidden mt-8 grid grid-cols-5 gap-1 rounded-[1.4rem] border border-line/45 bg-surface-sunk/40 p-1.5 backdrop-blur-lg relative z-10"
+      >
+        {pillarTabs.map((t, i) => {
+          const Icon = t.icon;
+          const active = activeTab === i;
+          return (
+            <button
+              key={t.hi}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setActiveTab(i)}
+              className={`flex flex-col items-center gap-1.5 rounded-2xl px-0.5 py-2.5 transition-all duration-300 active:scale-95 ${
+                active
+                  ? "text-white shadow-[0_10px_22px_-12px_var(--glow-green)]"
+                  : "text-ink-soft hover:text-ink-strong"
+              }`}
+              style={active ? { backgroundImage: t.gradient } : undefined}
+            >
+              <Icon className="h-[1.15rem] w-[1.15rem] shrink-0" />
+              <span className="text-[0.6rem] font-bold leading-none">{t.hi}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 lg:mt-12 grid grid-cols-1 gap-6 lg:grid-cols-12 relative z-10">
         {/* ── Agriculture · किसान समृद्धि ─────────────────── */}
-        <TiltCard className={`${cardGreen} lg:col-span-7`} id="agriculture">
+        <TiltCard key={panelKey(0)} className={`${cardGreen} lg:col-span-7 ${panelClass(0)}`} id="agriculture">
           <PillarHead
             Icon={Sprout}
             gradient={G.green}
@@ -401,7 +468,7 @@ const Pillars = () => {
         </TiltCard>
 
         {/* ── Education · विद्या दीप ───────────────────────── */}
-        <TiltCard className={`${cardGold} lg:col-span-5`} id="education">
+        <TiltCard key={panelKey(1)} className={`${cardGold} lg:col-span-5 ${panelClass(1)}`} id="education">
           <PillarHead
             Icon={GraduationCap}
             gradient={G.gold}
@@ -450,7 +517,7 @@ const Pillars = () => {
         </TiltCard>
 
         {/* ── Infrastructure · विकास की रफ़्तार ──────────────── */}
-        <TiltCard className={`${cardGreen} lg:col-span-7`} id="infrastructure">
+        <TiltCard key={panelKey(2)} className={`${cardGreen} lg:col-span-7 ${panelClass(2)}`} id="infrastructure">
           <PillarHead
             Icon={Route}
             gradient={G.route}
@@ -505,7 +572,7 @@ const Pillars = () => {
         </TiltCard>
 
         {/* ── Panchayat Digital Ledger · पंचायत बही-खाता ────── */}
-        <TiltCard className={`${cardGold} lg:col-span-5`} id="panchayat">
+        <TiltCard key={panelKey(3)} className={`${cardGold} lg:col-span-5 ${panelClass(3)}`} id="panchayat">
           <PillarHead
             Icon={ScrollText}
             gradient={G.ledger}
@@ -563,7 +630,7 @@ const Pillars = () => {
         </TiltCard>
 
         {/* ── Digital Identity · डिजिटल पहचान ────────────────── */}
-        <TiltCard className={`${cardGreen} lg:col-span-12`} id="identity">
+        <TiltCard key={panelKey(4)} className={`${cardGreen} lg:col-span-12 ${panelClass(4)}`} id="identity">
           <PillarHead
             Icon={Fingerprint}
             gradient={G.id}

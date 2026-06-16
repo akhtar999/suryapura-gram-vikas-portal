@@ -285,6 +285,17 @@
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+@keyframes pillar-in {
+  from { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.97); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+/* Pillar cards animate in only on mobile, where they show one at a time
+   behind a tab bar. On lg+ the full grid is static. */
+@media (max-width: 1023px) {
+  .pillar-in {
+    animation: pillar-in 0.5s var(--ease-out-quint) both;
+  }
+}
 @keyframes sun-drift {
   from { transform: translate3d(-2%, 0, 0) scale(1); opacity: 0.85; }
   to { transform: translate3d(3%, -3%, 0) scale(1.08); opacity: 1; }
@@ -347,7 +358,7 @@
   .rise, .grow-bar, .sun-drift, .pulse-mic,
   .marquee-track, .marquee-track-reverse,
   .parallax-glow, .parallax-photo, .parallax-text,
-  .animate-rise, .animate-soundwave {
+  .animate-rise, .animate-soundwave, .pillar-in {
     animation: none !important;
   }
   body { transition: none !important; }

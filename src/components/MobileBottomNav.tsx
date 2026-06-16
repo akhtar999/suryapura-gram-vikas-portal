@@ -9,11 +9,19 @@ const scrollToSection = (id: string) => () => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
+// On mobile the pillars render one-at-a-time behind a tab bar, so deep-linking
+// to a specific pillar means activating its tab first, then scrolling to the
+// (always-visible) pillars section. Indices match the tab order in Pillars.tsx.
+const selectPillar = (index: number) => () => {
+  window.dispatchEvent(new CustomEvent("pillar:select", { detail: index }));
+  scrollToSection("pillars")();
+};
+
 const navItems: NavItem[] = [
   { id: "top",            icon: <Home />,     label: "Home",      onClick: scrollToSection("top") },
-  { id: "pillars",        icon: <Sprout />,   label: "Pillars",   onClick: scrollToSection("pillars") },
-  { id: "infrastructure", icon: <Route />,    label: "Progress",  onClick: scrollToSection("infrastructure") },
-  { id: "panchayat",      icon: <Landmark />, label: "Panchayat", onClick: scrollToSection("panchayat") },
+  { id: "pillars",        icon: <Sprout />,   label: "Pillars",   onClick: selectPillar(0) },
+  { id: "infrastructure", icon: <Route />,    label: "Progress",  onClick: selectPillar(2) },
+  { id: "panchayat",      icon: <Landmark />, label: "Panchayat", onClick: selectPillar(3) },
   { id: "support",        icon: <Phone />,    label: "Support",   onClick: scrollToSection("support") },
 ];
 
@@ -36,7 +44,12 @@ const MobileBottomNav = () => {
       const line = window.innerHeight * 0.35;
       let next = 0;
       sections.forEach((el, index) => {
-        if (el && el.getBoundingClientRect().top <= line) next = index;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        // Skip cards hidden behind a mobile tab — they collapse to a 0×0 box
+        // and would otherwise always register as "scrolled past".
+        if (rect.width === 0 && rect.height === 0) return;
+        if (rect.top <= line) next = index;
       });
       setActiveIndex(next);
     };
