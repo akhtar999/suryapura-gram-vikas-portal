@@ -1,26 +1,382 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ----------------------------------------------------------------------------
+   Suryapura Gram Vikas Portal — design system
+
+   Two crafted themes:
+   • Light  "Mitti & Dawn"        — warm clay/cream, never blinding white.
+   • Dark   "आंखों की सुरक्षा"      — midnight-forest green + warm non-glare
+                                      saffron/amber. Built to rest tired eyes.
+
+   shadcn tokens (--background, --card, --primary …) and the app's semantic
+   tokens (--color-surface, --color-ink, --color-band …) both resolve from the
+   same per-theme variables, so dark mode cascades with no per-element `dark:`.
+---------------------------------------------------------------------------- */
+
+@theme {
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-mukta), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── LIGHT · "Mitti & Dawn" ────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 1rem;
+
+  --background: oklch(0.974 0.006 75); /* warm clay cream ≈ #FAF8F5 */
+  --foreground: oklch(0.27 0.028 110); /* deep earthy ink */
+  --ink-strong: oklch(0.2 0.03 120);
+
+  --card: oklch(0.992 0.004 80);
+  --card-foreground: oklch(0.27 0.028 110);
+  --popover: oklch(0.992 0.004 80);
+  --popover-foreground: oklch(0.27 0.028 110);
+
+  --primary: oklch(0.44 0.1 150); /* deep organic green */
+  --primary-foreground: oklch(0.99 0.005 85);
+  --primary-deep: oklch(0.31 0.072 152);
+
+  --secondary: oklch(0.93 0.06 80); /* pale saffron */
+  --secondary-foreground: oklch(0.3 0.05 70);
+
+  --muted: oklch(0.948 0.012 72); /* sunk clay */
+  --muted-foreground: oklch(0.47 0.022 95);
+
+  --accent: oklch(0.93 0.035 145); /* soft green chip */
+  --accent-foreground: oklch(0.33 0.075 150);
+
+  --gold: oklch(0.8 0.15 73);
+  --gold-strong: oklch(0.71 0.16 65);
+  --gold-soft: oklch(0.93 0.06 80);
+  --on-gold: oklch(0.28 0.05 62);
+  --ochre: oklch(0.53 0.13 56);
+
+  --band: oklch(0.3 0.07 152); /* deep green feature band */
+  --on-band: oklch(0.96 0.02 88);
+
+  --destructive: oklch(0.55 0.19 27);
+  --destructive-foreground: oklch(0.99 0.01 60);
+  --danger-soft: oklch(0.94 0.04 30);
+
+  --border: oklch(0.9 0.012 75);
+  --line-strong: oklch(0.84 0.016 75);
+  --input: oklch(0.9 0.012 75);
+  --ring: oklch(0.55 0.09 150);
+
+  /* ambient glows tuned per theme */
+  --glow-gold: oklch(0.85 0.12 80 / 0.55);
+  --glow-green: oklch(0.7 0.1 150 / 0.35);
+}
+
+/* ── DARK · "Visual Comfort / आंखों की सुरक्षा" ─────────────────────────── */
+.dark {
+  --background: oklch(0.165 0.025 160); /* midnight-forest ≈ #0B1A12 */
+  --foreground: oklch(0.9 0.035 80); /* warm non-glare amber-cream */
+  --ink-strong: oklch(0.94 0.035 82);
+
+  --card: oklch(0.215 0.027 160); /* charcoal-earth */
+  --card-foreground: oklch(0.9 0.035 80);
+  --popover: oklch(0.215 0.027 160);
+  --popover-foreground: oklch(0.9 0.035 80);
+
+  --primary: oklch(0.76 0.15 148); /* luminous leaf green */
+  --primary-foreground: oklch(0.18 0.03 160);
+  --primary-deep: oklch(0.7 0.14 150);
+
+  --secondary: oklch(0.32 0.07 70); /* warm amber chip */
+  --secondary-foreground: oklch(0.92 0.05 82);
+
+  --muted: oklch(0.2 0.024 160);
+  --muted-foreground: oklch(0.74 0.035 78);
+
+  --accent: oklch(0.27 0.05 155); /* deep green chip */
+  --accent-foreground: oklch(0.83 0.12 150);
+
+  --gold: oklch(0.82 0.15 76); /* warm saffron, slightly raised */
+  --gold-strong: oklch(0.78 0.16 70);
+  --gold-soft: oklch(0.32 0.075 72);
+  --on-gold: oklch(0.16 0.03 65);
+  --ochre: oklch(0.8 0.13 72);
+
+  --band: oklch(0.19 0.03 163);
+  --on-band: oklch(0.92 0.03 82);
+
+  --destructive: oklch(0.64 0.17 27);
+  --destructive-foreground: oklch(0.16 0.02 30);
+  --danger-soft: oklch(0.28 0.07 30);
+
+  --border: oklch(0.34 0.02 155);
+  --line-strong: oklch(0.44 0.025 155);
+  --input: oklch(0.32 0.02 155);
+  --ring: oklch(0.7 0.13 150);
+
+  --glow-gold: oklch(0.8 0.14 78 / 0.32);
+  --glow-green: oklch(0.62 0.13 150 / 0.3);
 }
 
 @theme inline {
+  /* shadcn semantic tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* app semantic tokens — bridged to the same per-theme variables */
+  --color-surface: var(--card);
+  --color-surface-sunk: var(--muted);
+  --color-ink: var(--foreground);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--muted-foreground);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-soft: var(--accent);
+  --color-on-primary: var(--primary-foreground);
+  --color-band: var(--band);
+  --color-on-band: var(--on-band);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-soft: var(--gold-soft);
+  --color-on-gold: var(--on-gold);
+  --color-ochre: var(--ochre);
+  --color-line: var(--border);
+  --color-line-strong: var(--line-strong);
+  --color-danger: var(--destructive);
+  --color-danger-soft: var(--danger-soft);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    /* guard against any single wide element creating horizontal scroll */
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-mukta), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* keep theme switches gentle on the eyes */
+    transition: background-color 0.4s var(--ease-out-quint),
+      color 0.4s var(--ease-out-quint);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+    color: var(--ink-strong);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: var(--gold-soft);
+    color: var(--ink-strong);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ----------------------------------------------------------------------------
+   Motion — orchestrated, content-visible-by-default, reduced-motion safe.
+---------------------------------------------------------------------------- */
+@layer utilities {
+  .rise {
+    animation: rise 0.9s var(--ease-out-expo) both;
+  }
+  .grow-bar {
+    transform-origin: left center;
+    animation: grow-bar 1.4s var(--ease-out-quint) both;
+  }
+  .sun-drift {
+    animation: sun-drift 14s ease-in-out infinite alternate;
+  }
+  .pulse-mic {
+    animation: pulse-mic 2.4s var(--ease-out-quint) infinite;
+  }
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 50s) linear infinite;
+  }
+  .marquee-track-reverse {
+    animation: marquee-reverse var(--marquee-duration, 60s) linear infinite;
+  }
+  .marquee-mask:hover .marquee-track,
+  .marquee-mask:hover .marquee-track-reverse {
+    animation-play-state: paused;
+  }
+
+  .reveal-delay-1 { animation-delay: 0.06s; }
+  .reveal-delay-2 { animation-delay: 0.14s; }
+  .reveal-delay-3 { animation-delay: 0.24s; }
+  .reveal-delay-4 { animation-delay: 0.36s; }
+  .reveal-delay-5 { animation-delay: 0.48s; }
+  .animate-shimmer {
+    animation: shimmer 2.5s infinite linear;
+  }
+  .animate-rise {
+    animation: rise 0.5s var(--ease-out-expo) both;
+  }
+  .animate-soundwave {
+    animation: soundwave 0.6s ease-in-out infinite;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes soundwave {
+  0%, 100% { transform: scaleY(0.2); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes grow-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes sun-drift {
+  from { transform: translate3d(-2%, 0, 0) scale(1); opacity: 0.85; }
+  to { transform: translate3d(3%, -3%, 0) scale(1.08); opacity: 1; }
+}
+@keyframes pulse-mic {
+  0% { box-shadow: 0 0 0 0 var(--glow-gold); }
+  70% { box-shadow: 0 0 0 14px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+/* ── Scroll-Driven 3D/Depth Parallax ────────────────── */
+@keyframes parallax-glow {
+  from { transform: translate3d(-2%, 0, 0) scale(1) translateY(0); }
+  to { transform: translate3d(3%, -3%, 0) scale(1.05) translateY(100px); }
+}
+@keyframes parallax-photo {
+  from { transform: translateY(0); }
+  to { transform: translateY(-70px); }
+}
+@keyframes parallax-text {
+  from { transform: translateY(0); }
+  to { transform: translateY(-30px); }
+}
+
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  .timeline-hero {
+    view-timeline-name: --hero-timeline;
+    view-timeline-axis: block;
+  }
+  
+  .parallax-glow {
+    animation: parallax-glow linear both;
+    animation-timeline: --hero-timeline;
+    animation-range: exit 0% exit 100%;
+  }
+
+  .parallax-photo {
+    animation: parallax-photo linear both;
+    animation-timeline: --hero-timeline;
+    animation-range: exit 0% exit 100%;
+  }
+
+  .parallax-text {
+    animation: parallax-text linear both;
+    animation-timeline: --hero-timeline;
+    animation-range: exit 0% exit 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise, .grow-bar, .sun-drift, .pulse-mic,
+  .marquee-track, .marquee-track-reverse,
+  .parallax-glow, .parallax-photo, .parallax-text,
+  .animate-rise, .animate-soundwave {
+    animation: none !important;
+  }
+  body { transition: none !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
+
+/* ── Seasonal Background Tint ───────────────────────────
+   Shifts the page background subtly based on Indian agricultural seasons.
+   Applied via JS class on <html> based on current month.
+   Jun–Sep (Monsoon/Kharif): cooler green tint
+   Oct–Feb (Rabi/Winter): warmer saffron tint
+   Mar–May (Summer/Harvest): golden warmth
+──────────────────────────────────────────────────────── */
+.season-monsoon {
+  --background: oklch(0.974 0.009 145); /* cooler green-grey */
+}
+.season-rabi {
+  --background: oklch(0.976 0.008 80); /* warmer saffron cream */
+}
+.season-harvest {
+  --background: oklch(0.975 0.010 72); /* golden warmth */
+}
+
+.dark.season-monsoon {
+  --background: oklch(0.165 0.028 155);
+}
+.dark.season-rabi {
+  --background: oklch(0.17 0.022 100);
+}
+.dark.season-harvest {
+  --background: oklch(0.168 0.025 80);
 }
